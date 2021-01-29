@@ -1,1 +1,5 @@
 .terraform*
+build/
+quotes/target
+newsfeed/target
+front-end/target

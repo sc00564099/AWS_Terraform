@@ -4,23 +4,51 @@
 
 **As an interviewer on the day of pairing**:
 
-1. Obtain a checkout/zip of this codebase.
+
+
+1. Obtain a checkout/zip of this codebase and set to match candidates version.
+
+```
+Working from the resulting unzipped folder:
+
+# match the code to the candidates
+$ export CODE_PREFIX=<candidate's lastname>
+$ bash randomize.sh
+```
+
 2. Make sure you have all tools installed:
 
-    ```
-    ./recops.sh install_tools
+```
+Confirm you have a local [Docker(https://www.docker.com/products/docker-desktop) installation. 
+Confirm a current version (1 or 2) of the aws cli is in your local path.  
+Confirm `make` is in your path.   
+Install [Dojo](https://github.com/kudulab/dojo). This provides a wrapper around docker commands to help provide a consistent development environment for containers and the candidate will likely be using the same.  
+```
 
-3. Make sure you can access Okta Chiclet `AWS - <your_country_code> Recruitment` and go to AWS console. If not, mail `identity-support@thoughtworks.com` to request access. If it's too late, use your own AWS account.
+3. Access Okta Chiclet `AWS - NA Recruitment` and go to AWS console.  
 
-4. When you are in the office before the interview, start deploying the infrastructure (it takes between 15-25 minutes) by running:
+4. Activate/Rotate you personal credentials
 
-    ```sh
-    export CODE_PREFIX=<candidate's lastname>
-    eval $(./recops.sh login)
+5. Deploying the infrastructure and news application (it takes between 15-25 minutes) by running:
+
+```bash
+# deploy the infrastructure
+$ aws-vault exec tw.first.last --no-session -- make backend-support.infra
+$ aws-vault exec tw.first.last --no-session -- make base.infra
+$ make apps
+$ make docker
+aws-vault exec recruit.nic.cheneweth --no-session -- make news.infra
+
+$ aws-vault exec recruit.nic.cheneweth --no-session -- make _push
+# deploy the app
+
+
     make deploy_interview
     ```
    To save approx 10-15 mins you can skip building app jars during `make deploy_interview`. Set `export SKIP_APP_BUILD=true`
    before running. You would need to have built app jars atleast once for this to work. Check `build/` directory for app jars.
+
+
 
 5. When it's time to pair with candidate, **you are responsible to give them AWS access**. There are 3 ways to do so:
  - If candidate is OK with using interviewer's laptop, just continue working from your laptop after running `eval $(./recops.sh login)`.

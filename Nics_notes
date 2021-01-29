@@ -2,8 +2,11 @@ no combination of credentials and MFA options passes the NA aws account idp inte
 
 so instead, to be able to test the rest
 
-- create credentials:  'recruit.nic.cheneweth'
-- add to aws-vault
+1. Create personal credentials using the format 'tw.first.last'
+
+- create your own credentials with programmatic access
+- attach the AdministratorAccess managed policy directly
+- add these credentials to your local aws-vault (or whatever local aws credentials management practice you follow)
 
 
 Can't have default values for s3 buckets as those are global-unique names. Added '-na' to s3 name definition. 
@@ -42,7 +45,7 @@ Now can go ahead and deploy the specific app infra and the app itself.
 
 ```bash
 # deploy product infra and app
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _news.infra
+$ aws-vault exec recruit.nic.cheneweth --no-session -- make news.infra
 
 ```
 

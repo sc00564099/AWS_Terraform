@@ -1,6 +1,6 @@
 # Setup our aws provider
 variable "region" {
-  default = "eu-west-1"
+  default = "us-east-1"
 }
 
 provider "aws" {
