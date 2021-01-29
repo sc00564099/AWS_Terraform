@@ -1,3 +1,3 @@
 variable "prefix" {
-  default = "newsdgshygdf436dg"
+  default = "news4321"
 }

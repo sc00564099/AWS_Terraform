@@ -5,5 +5,5 @@ variable "docker_image_tag" {
   default = "latest"
 }
 variable "prefix" {
-  default = "newsdgshygdf436dg"
+  default = "news4321"
 }
