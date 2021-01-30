@@ -1,58 +1,71 @@
-no combination of credentials and MFA options passes the NA aws account idp integration for me
+First did the infra-interview-support. Had to change the na s3 bucket convention to tw-joii-nan as -na had been created and deleted in the past in eu-west so...  
+Then  
 
-so instead, to be able to test the rest
+When following the directions:  
+
+After the successful login, running `make deploy_interview` fails with the following message:  
+
+```
+Error: No valid credential sources found for AWS Provider.
+	Please see https://terraform.io/docs/providers/aws/index.html for more information on
+	providing credentials for the AWS Provider
+
+  on provider.tf line 6, in provider "aws":
+   6: provider "aws" {
+```
+
+This is right after the app-build steps, which can range from 25 to 40 min to build on 16" Macbook Pro 2019 with gigabit connection. Whoa  
+
+## First work around strategy  
+
 
 1. Create personal credentials using the format 'tw.first.last'
 
-- create your own credentials with programmatic access
-- attach the AdministratorAccess managed policy directly
-- add these credentials to your local aws-vault (or whatever local aws credentials management practice you follow)
+- create your own credentials with programmatic access  
+- attach the AdministratorAccess managed policy directly  
+- add these credentials to local aws-vault  
+
+Run the command:  
+```
+$ aws-vauilt exec tw.nic.cheneweth -- make deploy_interview
 
 
-Can't have default values for s3 buckets as those are global-unique names. Added '-na' to s3 name definition. 
+It now fails while building the back.infra with the following error:  
+```
+Error: Error creating IAM Role newsdope_news_host: InvalidClientTokenId: The security token included in the request is invalid
+	status code: 403, request id: 14eb4ee3-35b0-43e8-a614-e0bd217b9c7e
 
-```bash
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _backend-support.infra  # these can make use of dojo
+  on iam-vms.tf line 12, in resource "aws_iam_role" "news_host":
+  12: resource "aws_iam_role" "news_host" {
+```
 
-
-start of interview
-
-- generate credentials for the candidate - 'frst.last.candidate'
-- select 'save to csv' option and zoom-chat the contents to candidate start of interview
-- as a first step, have the candidate rotate the provided credentials
-
-
-
-
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _base.infra
-
-# build app artifacts, then build docker images
-$ make apps
+So i manually run the following:  
+```
+$ aws-vault exec tw.nic.cheneweth --no-session -- make backend-support.infra
+$ aws-vault exec tw.nic.cheneweth --no-session -- make base.infra
 $ make docker
 ```
 
-Can't use currently supported aws cli versions to login in the way the makefile does so updated to:  
+but push failed with aws cli errors. Made the follwing correction:  
 
-aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin $(REPO_URL)  
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(REPO_URL)$(IMAGE_NAME)
 
-Also, dojo doesn't expect to also run docker commands, yet the above makes that a bit challenging, so removed. Which basically just means that aws cli must be installed locally.  
 
-```bash
-# push images
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _push
+Now run the following:  
 ```
-Now can go ahead and deploy the specific app infra and the app itself.  
-
-```bash
-# deploy product infra and app
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make news.infra
-
+$ aws-vault exec tw.nic.cheneweth --no-session -- make push
+$ aws-vault exec tw.nic.cheneweth --no-session -- make news.infra
+$ aws-vault exec tw.nic.cheneweth --no-session -- make deploy_site
 ```
+
+Works;;;
+
+
 
 Tear it all down
 
 ```bash
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _news.deinfra
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _base.deinfra
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _backend-support.deinfra
+$ aws-vault exec tw.nic.cheneweth --no-session -- make news.deinfra
+$ aws-vault exec tw.nic.cheneweth --no-session -- make base.deinfra
+$ aws-vault exec tw.nic.cheneweth --no-session -- make backend-support.deinfra
 ```

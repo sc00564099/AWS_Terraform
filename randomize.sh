@@ -14,9 +14,7 @@ function randomize {
     : "${CODE_PREFIX?Required, set it to candidate\'s lastname}"
     echo "${CODE_PREFIX}" > interview_id.txt
     INTERVIEW_CODE=$(cat interview_id.txt)
-    echo $INTERVIEW_CODE
-    >&2 find ./infra -name '*.tf' -exec sed -i '' "s/news4321/news${INTERVIEW_CODE}/g" {} \;
+    >&2 find ./infra -type f -exec sed -i "s/news4321/news$INTERVIEW_CODE/g" {} \;
+    #>&2 find ./infra -name '*.tf' -exec sed -i '' "s/news4321/news${INTERVIEW_CODE}/g" {} \;
   fi
 }
-
-randomize

@@ -4,41 +4,36 @@
 
 **As an interviewer on the day of pairing**:
 
-1. Obtain a checkout/zip of this codebase and set to match candidates version.
-
-```
-Working from the resulting unzipped folder:
-
-# match the code to the candidates
-$ export CODE_PREFIX=<candidate's lastname>
-$ bash randomize.sh
-```
+1. Obtain a checkout/zip of this codebase
 
 2. Make sure you have all tools installed:
 
-```
-Confirm you have a local [Docker(https://www.docker.com/products/docker-desktop) installation. 
-Confirm a current version (1 or 2) of the aws cli is in your local path.  
-Confirm `make` is in your path.   
-Install [Dojo](https://github.com/kudulab/dojo). This provides a wrapper around docker commands to help provide a consistent development environment for containers and the candidate will likely be using the same.  
-```
-
-3. Access Okta Chiclet `AWS - NA Recruitment` and go to AWS console.  
-
-4. Activate/Rotate you personal credentials
-
-5. Deploying the infrastructure and news application (it takes between 15-25 minutes) by running:
-
 ```bash
-# deploy the infrastructure
-$ aws-vault exec tw.first.last --no-session -- make backend-support.infra
-$ aws-vault exec tw.first.last --no-session -- make base.infra
-$ make apps
-$ make docker
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make push
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make news.infra
+$ ./recops.sh install_tools
+```
 
+3. Make sure you can access Okta Chiclet `AWS - NA Recruitment` and go to AWS console.
 
+4. Deploying the infrastructure and news application (it takes between 15-25 minutes) by running:
+
+```sh
+export CODE_PREFIX=<candidate's lastname>
+eval $(./recops.sh login)
+
+{
+    "AccessKey": {
+        "AccessKeyId": "AK***",
+        "SecretAccessKey": "ZGOL4*****",
+        "Status": "Active",
+        "UserName": "interview-smith",
+        "CreateDate": "2021-01-30T21:42:49Z"
+    }
+}
+```
+
+**IMPORTANT**
+
+The above will display the candidates temporary credentials. Please keep track of these as you will need to provide them to the candidate.  
 
     make deploy_interview
     ```
@@ -46,14 +41,13 @@ $ aws-vault exec recruit.nic.cheneweth --no-session -- make news.infra
    before running. You would need to have built app jars atleast once for this to work. Check `build/` directory for app jars.
 
 
+5. When it's time to pair with candidate, **you are responsible to give them AWS access**.  
 
-5. When it's time to pair with candidate, **you are responsible to give them AWS access**. There are 3 ways to do so:
- - If candidate is OK with using interviewer's laptop, just continue working from your laptop after running `eval $(./recops.sh login)`.
- - If candidate wants to use their laptop:
-     - Run `./recops.sh candidate_prep`, this will produce a message with **Some instructions & AWS credentials that you can send to the candidate via email**.
+**Zoom** Paste the output temporary credentials created above into the Zoom chat, along with directions to set the following environment variable:  
 
-[Optional] If for some reason you have to share the code on your machine with the candidate:
-  - Run `./recops.sh prepare_candidate_zip`, this will produce a uniqe s3 link with the codebase which you can share with the candidate.
+```bash
+$ export CODE_PREFIX=<candidate's lastname>
+```
 
 6. In the beginning of the interview - [deploy the entire solution in one go](#deployment-in-one-go) with: `make deploy_interview`.
 
