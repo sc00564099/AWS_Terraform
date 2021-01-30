@@ -4,8 +4,6 @@
 
 **As an interviewer on the day of pairing**:
 
-
-
 1. Obtain a checkout/zip of this codebase and set to match candidates version.
 
 ```
@@ -37,10 +35,9 @@ $ aws-vault exec tw.first.last --no-session -- make backend-support.infra
 $ aws-vault exec tw.first.last --no-session -- make base.infra
 $ make apps
 $ make docker
-aws-vault exec recruit.nic.cheneweth --no-session -- make news.infra
+$ aws-vault exec recruit.nic.cheneweth --no-session -- make push
+$ aws-vault exec recruit.nic.cheneweth --no-session -- make news.infra
 
-$ aws-vault exec recruit.nic.cheneweth --no-session -- make _push
-# deploy the app
 
 
     make deploy_interview

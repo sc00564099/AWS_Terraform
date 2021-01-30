@@ -12,7 +12,7 @@ echo "Provisioning docker image $DOCKER_IMAGE"
 docker stop quotes || true
 docker rm quotes || true
 
-eval $(aws ecr get-login --region eu-west-1 --no-include-email)
+eval $(aws ecr get-login --region us-east-1 --no-include-email)
 
 docker pull $DOCKER_IMAGE
 

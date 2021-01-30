@@ -56,14 +56,14 @@ $(BUILD_DIR):
 _%.push:
 	$(eval IMAGE_NAME = $(subst -,_,$*))
 	$(eval REPO_URL := $(shell cat ${ECR_URL_FILE}))
-	aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin $(REPO_URL)
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(REPO_URL)$(IMAGE_NAME)
 	docker tag $(IMAGE_NAME) $(REPO_URL)$(IMAGE_NAME)
 	docker push $(REPO_URL)$(IMAGE_NAME)
 
 %.push:
 	$(eval IMAGE_NAME = $(subst -,_,$*))
 	$(eval REPO_URL := $(shell cat ${ECR_URL_FILE}))
-	aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin $(REPO_URL)
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(REPO_URL)$(IMAGE_NAME)
 	docker tag $(IMAGE_NAME) $(REPO_URL)$(IMAGE_NAME)
 	docker push $(REPO_URL)$(IMAGE_NAME)
 
