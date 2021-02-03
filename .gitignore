@@ -1,5 +1,6 @@
 .terraform*
-build/
 quotes/target
 newsfeed/target
 front-end/target
+terraform.tfstate
+terraform.tfstate.backup

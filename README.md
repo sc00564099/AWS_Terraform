@@ -1,7 +1,7 @@
 <div align="center">
   <h3>NA joi-news for AWS interview-pairing content</h3>
   <h1>techops-recsys-infra-hiring/joi-news-aws-na</h1>
-  <h5>NA Recruitment experiment</h5>
+  <h5>NA Recruitment</h5>
 </div>
 <br />
 
@@ -12,9 +12,15 @@ This project contains three services:
 * `newsfeed` which aggregates several RSS feeds together
 * `front-end` which calls the two previous services and displays the results.
 
-The services are provided as docker images. This README documents the steps to build the images and provision the infrastructure for the services.
+The services are provided as docker images. This README documents the steps to build the images and provision the infrastructure for the services.  
 
-# Development and operations tools setup
+They interviewer will have pre-deployed this application and the underlying infrastructure in advance of the pairing session.  
+
+As described in the email you received with the link to this content, review the deployments files to familiarize yourself with these services. During the interview, the interviewer will discuss potential improvements and ask you to make and apply the changes. Please come prepared to discuss and apply at least one improvement based on your own review of this content.  
+
+# Initial Setup
+
+## Development and operations tools setup
 
 There are 2 options for getting the right tools on developer's laptop:
  * **quick** leverage Docker+Dojo. Requires only to install docker and dojo on your laptop.
@@ -22,7 +28,7 @@ There are 2 options for getting the right tools on developer's laptop:
 
  The rest of this file describes the quick way, please refer to [MANUAL_SETUP.md](MANUAL_SETUP.md) for the other option.
 
-## Docker+Dojo setup
+### Docker+Dojo setup
 
 We can leverage docker to define required build and operations dependencies by referencing docker images.
 
@@ -49,89 +55,72 @@ sudo chmod +x /usr/local/bin/dojo
 
 This project is also using `make`, so ensure that you have that on your PATH too.
 
-# Infrastructure setup
+## Localize the Code
 
-This is a multi-step guide to setup some base infrastructure, and then, on top of it, the test environment for the newsfeed application.
+In addition to the link to download this code amples, you will have been provided with a CODE_PREFIX. This is usually you last name. Please confirm in the email.  
 
-## Base infrastructure setup
+From the command line, define the necessary environment variable and run the localization script as follow:  
 
-With an assumption that we have a new, empty AWS account, we need to provision some base infrastructure just one time.
-These steps will provision:
- * terraform backend in S3 bucket and locking with DynamoDB
- * a minimal VPC with 2 subnets
- * ECR repositories for docker images
+```sh
+$ export CODE_PREFIX=****
+$ make localize
+```
+
+Your code sample should now match that used by the Interview to prepare for the pairing session.  
+
+## Infrastructure Components  
+
+THere are three elements to the infrastructure configuration.  
+
+1. backend-support
+
+This is the S3 bucket and DynamoDB table to support locking for the remote terraform state.  
+
+2. base
+
+The base resources to support deploying the apps:
+
+- ECR repositories for the Docker images
+- IAM configuration for the compute
+- VPC
+
+3. news app infra
+
+The princple pieces of infrastructure for the news app.  
+
+During the pairing exercise you will not be interacting with the backend-support components though of course you may discuss alternative approaches if you believe there are superior alternatives. 
 
 ### Setup aws credentials
+
 The interviewer will send you an email with AWS credentials, which you should export in your shell.
 
 ```sh
-export CODE_PREFIX=****
+export CODE_PREFIX=****              # same as above
 export AWS_SECRET_ACCESS_KEY=****
 export AWS_ACCESS_KEY_ID=****
+export AWS_DEFAULT_REGION=us-east-1
 ```
 
-Now run:
+## Infrastructure changes
 
-```sh
-./randomize.sh
-make backend-support.infra
-make base.infra
-```
+Once you have set the above environment variables, you will be able to make and deploy code changes.  
 
-## Build the application artifacts
+### Deploy changes
 
-If you haven't built the jars and static resources yet, you should do so now:
+Depending on where you make a change, one or more of the following commands can be used to apply.  
 
-```sh
-make apps
-```
+1. make base.infra  
 
-## Build docker images
+To apply changes to the base infrastructure.   
 
-Artifacts from previous stage will be packaged into docker images, then pushed to ECR.
+2. make news.infra  
 
-Each application has its own image. Individual image can be built with:
+To apply changes to the News application infrastructure and deployment.  
 
-```sh
-make <app-name>.docker
-# for example:
-make front-end.docker
-```
+One of the outputs from this process is the URL for the news application. The interviewer will provide you the current url and you will also see this in the output as you make changes.  
 
-But you can build all images at once with
+frontend_url = http://34.244.219.156:8080  
 
-```sh
-make docker
-```
+3. make deploy_site
 
-## Push docker images
-
-Before applications can be deployed on AWS, the docker images have to be pushed:
-
-```sh
-make push
-```
-
-## Provision services
-
-Then, we can provision the backend and front-end services:
-
-```sh
-make news.infra
-```
-
-Terraform will print the output with URL of the front_end server, e.g.
-
-```
-Outputs:
-
-frontend_url = http://34.244.219.156:8080
-```
-
-## Delete services
-
-To delete the deployment provisioned by terraform, run following commands:
-
-```sh
-make news.deinfra
-```
+To re-deploy the application static content if needed.  

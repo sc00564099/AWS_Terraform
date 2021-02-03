@@ -113,25 +113,36 @@ randomize: interview_id.txt
 
 _randomize: _interview_id.txt
 
-deploy_interview: randomize
-ifeq ($(SKIP_BUILD), true)
-	echo "Request to skip app build received."
-ifeq ($(and $(wildcard build/front-end.jar),$(wildcard build/quotes.jar),$(wildcard build/newsfeed.jar),$(wildcard build/static.tgz)),)
-	echo "One or More required build files is missing. Cannot Skip App Build."
-	$(MAKE) apps
-else
-	echo "All required files present in build directory. Skipping App Build."
-endif
-else
-	echo "Running App build"
-	$(MAKE) apps
-endif
+localize:
+	dojo "bash localize.sh"
+	
+deploy_interview: 
 	$(MAKE) backend-support.infra
 	$(MAKE) base.infra
 	$(MAKE) docker # builds all images
 	$(MAKE) push
 	$(MAKE) news.infra
 	$(MAKE) deploy_site
+
+# deploy_interview: randomize
+# ifeq ($(SKIP_BUILD), true)
+# 	echo "Request to skip app build received."
+# ifeq ($(and $(wildcard build/front-end.jar),$(wildcard build/quotes.jar),$(wildcard build/newsfeed.jar),$(wildcard build/static.tgz)),)
+# 	echo "One or More required build files is missing. Cannot Skip App Build."
+# 	$(MAKE) apps
+# else
+# 	echo "All required files present in build directory. Skipping App Build."
+# endif
+# else
+# 	echo "Running App build"
+# 	$(MAKE) apps
+# endif
+# 	$(MAKE) backend-support.infra
+# 	$(MAKE) base.infra
+# 	$(MAKE) docker # builds all images
+# 	$(MAKE) push
+# 	$(MAKE) news.infra
+# 	$(MAKE) deploy_site
 
 destroy_interview:
 	$(MAKE) news.deinfra
